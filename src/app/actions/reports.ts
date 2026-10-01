@@ -1,0 +1,164 @@
+"use server";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+
+interface Payouts {
+  chatterAmount: number;
+  recruiterAmount: number;
+  ownerAmount: number;
+}
+
+export async function approveReport(reportId: string, payouts: Payouts) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') {
+      throw new Error("Только Главный Админ может одобрять отчеты к выплате");
+    }
+
+    const report = await prisma.report.findUnique({
+      where: { id: reportId },
+      include: { chatter: { include: { band: true } } }
+    });
+
+    if (!report || report.status !== 'PENDING_CALCULATION') {
+      throw new Error("Отчет не найден или уже обработан");
+    }
+
+    if (!report.chatter.band) {
+      throw new Error("Чатер не состоит в банде");
+    }
+
+    const { chatterAmount, recruiterAmount, ownerAmount } = payouts;
+    const chatterId = report.chatterId;
+    const recruiterId = report.chatter.invitedById;
+    const ownerId = report.chatter.band.ownerId;
+
+    const txs: any[] = [
+      prisma.report.update({
+        where: { id: reportId },
+        data: { 
+          status: 'APPROVED',
+          chatterAmount,
+          recruiterAmount: recruiterId && recruiterAmount > 0 ? recruiterAmount : null,
+          ownerAmount: ownerId && ownerAmount > 0 && ownerId !== recruiterId ? ownerAmount : null
+        }
+      })
+    ];
+
+    if (chatterAmount > 0) {
+      txs.push(
+        prisma.user.update({
+          where: { id: chatterId },
+          data: { balance: { increment: chatterAmount } }
+        })
+      );
+    }
+    
+    if (recruiterId && recruiterAmount > 0) {
+      txs.push(
+        prisma.user.update({
+          where: { id: recruiterId },
+          data: { balance: { increment: recruiterAmount } }
+        })
+      );
+    }
+
+    // Don't double pay if recruiter is the owner
+    if (ownerId && ownerAmount > 0 && ownerId !== recruiterId) {
+      txs.push(
+        prisma.user.update({
+          where: { id: ownerId },
+          data: { balance: { increment: ownerAmount } }
+        })
+      );
+    }
+
+    await prisma.$transaction(txs);
+
+    revalidatePath("/reports");
+    revalidatePath("/");
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error approving report:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function rejectReport(reportId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      throw new Error("Не авторизован");
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (currentUser?.role === 'CHATTER') {
+      throw new Error("Нет прав");
+    }
+
+    const report = await prisma.report.findUnique({
+      where: { id: reportId }
+    });
+
+    if (!report || (report.status !== 'PENDING_REVIEW' && report.status !== 'PENDING_CALCULATION')) {
+      throw new Error("Отчет не найден или уже обработан");
+    }
+
+    await prisma.report.update({
+      where: { id: reportId },
+      data: { status: 'REJECTED' }
+    });
+
+    revalidatePath("/reports");
+    revalidatePath("/");
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error rejecting report:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function sendToCalculation(reportId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      throw new Error("Не авторизован");
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (currentUser?.role === 'CHATTER') {
+      throw new Error("Нет прав");
+    }
+
+    const report = await prisma.report.findUnique({
+      where: { id: reportId }
+    });
+
+    if (!report || report.status !== 'PENDING_REVIEW') {
+      throw new Error("Отчет не найден или уже обработан");
+    }
+
+    await prisma.report.update({
+      where: { id: reportId },
+      data: { status: 'PENDING_CALCULATION' }
+    });
+
+    revalidatePath("/reports");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error sending report to calculation:", error);
+    return { success: false, error: error.message };
+  }
+}
