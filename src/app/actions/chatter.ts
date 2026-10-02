@@ -70,6 +70,22 @@ export async function approveChatter(chatterId: string) {
       throw new Error("Не авторизован");
     }
 
+    const chatter = await prisma.user.findUnique({
+      where: { id: chatterId },
+      include: { band: true }
+    });
+
+    if (!chatter) throw new Error("Чатер не найден");
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { ownedBand: true }
+    });
+
+    if (currentUser?.role !== "ADMIN" && chatter.bandId !== currentUser?.ownedBand?.id) {
+      throw new Error("Нет прав");
+    }
+
     await prisma.user.update({
       where: { id: chatterId },
       data: { status: 'ACTIVE' }
@@ -87,6 +103,22 @@ export async function deleteChatter(chatterId: string) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       throw new Error("Не авторизован");
+    }
+
+    const chatter = await prisma.user.findUnique({
+      where: { id: chatterId },
+      include: { band: true }
+    });
+
+    if (!chatter) throw new Error("Чатер не найден");
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { ownedBand: true }
+    });
+
+    if (currentUser?.role !== "ADMIN" && chatter.bandId !== currentUser?.ownedBand?.id) {
+      throw new Error("Нет прав");
     }
 
     await prisma.user.delete({

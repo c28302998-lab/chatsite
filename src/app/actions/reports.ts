@@ -119,7 +119,8 @@ export async function rejectReport(reportId: string) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: session.user.id },
+      include: { ownedBand: true }
     });
 
     if (currentUser?.role === 'CHATTER') {
@@ -127,11 +128,16 @@ export async function rejectReport(reportId: string) {
     }
 
     const report = await prisma.report.findUnique({
-      where: { id: reportId }
+      where: { id: reportId },
+      include: { chatter: true }
     });
 
     if (!report || (report.status !== 'PENDING_REVIEW' && report.status !== 'PENDING_CALCULATION')) {
       throw new Error("Отчет не найден или уже обработан");
+    }
+
+    if (currentUser?.role !== 'ADMIN' && report.chatter.bandId !== currentUser?.ownedBand?.id) {
+      throw new Error("Нет прав: отчет не принадлежит вашей команде");
     }
 
     await prisma.report.update({
@@ -157,7 +163,8 @@ export async function sendToCalculation(reportId: string) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: session.user.id },
+      include: { ownedBand: true }
     });
 
     if (currentUser?.role === 'CHATTER') {
@@ -165,11 +172,16 @@ export async function sendToCalculation(reportId: string) {
     }
 
     const report = await prisma.report.findUnique({
-      where: { id: reportId }
+      where: { id: reportId },
+      include: { chatter: true }
     });
 
     if (!report || report.status !== 'PENDING_REVIEW') {
       throw new Error("Отчет не найден или уже обработан");
+    }
+
+    if (currentUser?.role !== 'ADMIN' && report.chatter.bandId !== currentUser?.ownedBand?.id) {
+      throw new Error("Нет прав: отчет не принадлежит вашей команде");
     }
 
     await prisma.report.update({
