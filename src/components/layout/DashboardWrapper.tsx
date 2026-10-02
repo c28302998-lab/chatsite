@@ -23,7 +23,7 @@ export function DashboardWrapper({
           <Menu className="w-6 h-6" />
         </button>
         <span className="ml-4 text-lg font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-          HUNTME CRM
+          Lunery Recruitment
         </span>
       </div>
 

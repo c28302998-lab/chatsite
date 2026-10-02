@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "HUNTME CRM",
+  title: "Lunery Recruitment",
   description: "Система рекрутинга и управления чатерами",
 };
 

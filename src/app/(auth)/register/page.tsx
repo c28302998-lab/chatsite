@@ -53,7 +53,7 @@ function RegisterForm() {
           {role === 'CHATTER' ? 'РЕГИСТРАЦИЯ ЧАТЕРА' : 'РЕГИСТРАЦИЯ'}
         </h1>
         <p className="text-slate-400 mt-2 text-sm">
-          {role === 'CHATTER' ? 'Присоединяйтесь к команде в HUNTME CRM' : 'Стать партнером HUNTME CRM'}
+          {role === 'CHATTER' ? 'Присоединяйтесь к команде в Lunery Recruitment' : 'Стать партнером Lunery Recruitment'}
         </p>
       </div>
 
@@ -83,7 +83,7 @@ function RegisterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all"
-            placeholder="user@huntme.com"
+            placeholder="user@lunery.app"
             required
           />
         </div>

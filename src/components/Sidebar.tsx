@@ -41,7 +41,7 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
         <span className="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-          HUNTME CRM
+          Lunery Recruitment
         </span>
       </div>
 

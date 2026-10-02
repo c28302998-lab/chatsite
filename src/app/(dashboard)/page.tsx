@@ -134,7 +134,7 @@ export default async function Home() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Дашборд</h1>
-          <p className="text-slate-400 mt-1">Добро пожаловать в HUNTME CRM. Обзор за сегодня.</p>
+          <p className="text-slate-400 mt-1">Добро пожаловать в Lunery Recruitment. Обзор за сегодня.</p>
         </div>
       </div>
 

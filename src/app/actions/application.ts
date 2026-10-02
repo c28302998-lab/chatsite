@@ -81,7 +81,7 @@ export async function acceptApplication(id: string) {
     const cleanPhone = application.phone?.replace(/[^0-9]/g, "") || "";
     const cleanTg = application.telegram?.replace(/[^a-zA-Z0-9]/g, "") || "";
     const randomSuffix = Math.floor(Math.random() * 10000);
-    const generatedEmail = `${cleanTg || cleanPhone || "chatter"}_${randomSuffix}@huntme.crm`.toLowerCase();
+    const generatedEmail = `${cleanTg || cleanPhone || "chatter"}_${randomSuffix}@lunery.app`.toLowerCase();
     const generatedPassword = "123456"; // Default password
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 

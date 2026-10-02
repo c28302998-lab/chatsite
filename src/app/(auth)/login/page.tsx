@@ -34,7 +34,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
       <Card className="w-full max-w-md p-8 bg-white/5 border-white/10 backdrop-blur-xl">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white tracking-wider">ВХОД В CRM</h1>
+          <h1 className="text-2xl font-bold text-white tracking-wider">ВХОД В LUNERY</h1>
           <p className="text-slate-400 mt-2 text-sm">Добро пожаловать обратно</p>
         </div>
 
@@ -52,7 +52,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all"
-              placeholder="admin@huntme.com"
+              placeholder="admin@lunery.app"
               required
             />
           </div>
