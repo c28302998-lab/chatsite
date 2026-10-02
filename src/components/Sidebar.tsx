@@ -20,7 +20,7 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
     : [
         { name: 'Главная', href: '/', icon: Home },
         { name: 'Заявки', href: '/applications', icon: Briefcase },
-        ...(showWorkersTab ? [{ name: 'Работники', href: '/workers', icon: Users }] : []),
+        ...(showWorkersTab ? [{ name: 'Саб-рекрутеры', href: '/workers', icon: Users }] : []),
         { name: 'Чатеры', href: '/chatters', icon: UserPlus },
         { name: 'Баланс', href: '/balance', icon: Wallet },
         { name: 'Отчеты', href: '/reports', icon: FileText },

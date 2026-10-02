@@ -133,10 +133,52 @@ async function main() {
       chatterAmount: 250,
       recruiterAmount: 50,
       ownerAmount: 200,
+      adminAmount: 0,
     }
   });
 
   console.log('Reports created.');
+
+  // 6. Create a Sub-Recruiter for Max
+  const subRecruiter = await prisma.user.create({
+    data: {
+      email: 'sub@1234',
+      name: 'Младший Рекрутер (sub)',
+      password: passwordHash,
+      role: 'PARTNER',
+      status: 'ACTIVE',
+      bandId: band.id,
+      invitedById: recruiter.id,
+    }
+  });
+
+  // 7. Create a Chatter for this Sub-Recruiter
+  const subChatter = await prisma.user.create({
+    data: {
+      name: 'Чатер от Саба',
+      email: 'subchatter@test.com',
+      password: passwordHash,
+      role: 'CHATTER',
+      status: 'ACTIVE',
+      bandId: band.id,
+      invitedById: subRecruiter.id,
+    }
+  });
+
+  // 8. Create a pending report for this Sub-Chatter
+  await prisma.report.create({
+    data: {
+      chatterId: subChatter.id,
+      shiftStart: new Date(Date.now() - 30000000),
+      shiftEnd: new Date(Date.now() - 5000000),
+      profitAmount: 300.00,
+      status: 'PENDING_CALCULATION',
+      screenshot: 'https://example.com/screenshot_sub.png',
+      accountAccess: 'sub:sub123',
+    }
+  });
+
+  console.log('Sub-recruiter and chatters created.');
   console.log('Seeding complete.');
 }
 

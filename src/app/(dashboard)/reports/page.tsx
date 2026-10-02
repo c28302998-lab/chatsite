@@ -184,6 +184,7 @@ export default async function ReportsPage() {
                         {report.chatterAmount != null && <span className="text-emerald-400">Чатер: ${report.chatterAmount.toFixed(2)}</span>}
                         {report.recruiterAmount != null && <span className="text-indigo-400">Рекрутер: ${report.recruiterAmount.toFixed(2)}</span>}
                         {report.ownerAmount != null && <span className="text-amber-400">Владелец: ${report.ownerAmount.toFixed(2)}</span>}
+                        {report.adminAmount != null && <span className="text-purple-400">Платформа: ${report.adminAmount.toFixed(2)}</span>}
                       </div>
                     ) : (
                       <span className="text-slate-500 text-xs">Не рассчитано</span>

@@ -9,6 +9,7 @@ interface Payouts {
   chatterAmount: number;
   recruiterAmount: number;
   ownerAmount: number;
+  adminAmount: number;
 }
 
 export async function approveReport(reportId: string, payouts: Payouts) {
@@ -31,7 +32,7 @@ export async function approveReport(reportId: string, payouts: Payouts) {
       throw new Error("Чатер не состоит в банде");
     }
 
-    const { chatterAmount, recruiterAmount, ownerAmount } = payouts;
+    const { chatterAmount, recruiterAmount, ownerAmount, adminAmount } = payouts;
     const chatterId = report.chatterId;
     const recruiterId = report.chatter.invitedById;
     const ownerId = report.chatter.band.ownerId;
@@ -43,7 +44,8 @@ export async function approveReport(reportId: string, payouts: Payouts) {
           status: 'APPROVED',
           chatterAmount,
           recruiterAmount: recruiterId && recruiterAmount > 0 ? recruiterAmount : null,
-          ownerAmount: ownerId && ownerAmount > 0 && ownerId !== recruiterId ? ownerAmount : null
+          ownerAmount: ownerId && ownerAmount > 0 && ownerId !== recruiterId ? ownerAmount : null,
+          adminAmount: adminAmount > 0 ? adminAmount : null
         }
       })
     ];
@@ -72,6 +74,15 @@ export async function approveReport(reportId: string, payouts: Payouts) {
         prisma.user.update({
           where: { id: ownerId },
           data: { balance: { increment: ownerAmount } }
+        })
+      );
+    }
+
+    if (adminAmount > 0) {
+      txs.push(
+        prisma.user.update({
+          where: { id: session.user.id },
+          data: { balance: { increment: adminAmount } }
         })
       );
     }

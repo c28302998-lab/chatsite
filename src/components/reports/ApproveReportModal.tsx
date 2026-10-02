@@ -19,11 +19,13 @@ export function ApproveReportModal({ reportId, profitAmount, chatterName, recrui
   const [ownerAmount, setOwnerAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
+  const adminAmount = Math.max(0, profitAmount - chatterAmount - recruiterAmount - ownerAmount);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await approveReport(reportId, { chatterAmount, recruiterAmount, ownerAmount });
+      const res = await approveReport(reportId, { chatterAmount, recruiterAmount, ownerAmount, adminAmount });
       if (!res.success) {
         alert("Ошибка: " + res.error);
       } else {
@@ -95,6 +97,13 @@ export function ApproveReportModal({ reportId, profitAmount, chatterName, recrui
               />
             </div>
           )}
+
+          <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg mt-4">
+            <p className="text-sm font-medium text-purple-400 flex justify-between items-center">
+              <span>Доля Платформы (Ваша прибыль):</span>
+              <span className="text-lg font-bold">${adminAmount.toFixed(2)}</span>
+            </p>
+          </div>
 
           <div className="pt-4 flex justify-end gap-3">
             <button 
