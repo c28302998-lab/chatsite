@@ -42,6 +42,16 @@ export async function updateApplicationStatus(id: string, status: any) {
     const session = await getServerSession(authOptions);
     if (!session) throw new Error("Нет доступа");
 
+    const application = await prisma.application.findUnique({
+      where: { id }
+    });
+
+    if (!application) throw new Error("Заявка не найдена");
+
+    if (session.user.role !== "ADMIN" && application.recruiterId !== session.user.id) {
+      throw new Error("Нет прав для изменения этой заявки");
+    }
+
     await prisma.application.update({
       where: { id },
       data: { status },

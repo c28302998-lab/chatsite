@@ -21,6 +21,27 @@ export async function addReport(formData: FormData) {
       throw new Error("Заполните все поля");
     }
 
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { ownedBand: true }
+    });
+
+    const targetChatter = await prisma.user.findUnique({
+      where: { id: chatterId }
+    });
+
+    if (!targetChatter) {
+      throw new Error("Чатер не найден");
+    }
+
+    if (
+      currentUser?.role !== "ADMIN" &&
+      targetChatter.bandId !== currentUser?.ownedBand?.id &&
+      targetChatter.bandId !== currentUser?.bandId
+    ) {
+      throw new Error("У вас нет прав добавлять отчет для этого чатера");
+    }
+
     const shiftStart = new Date(shiftStartStr);
     const shiftEnd = new Date(shiftEndStr);
     const profitAmount = parseFloat(profitAmountStr);
