@@ -44,7 +44,7 @@ export async function approveReport(reportId: string, payouts: Payouts) {
           status: 'APPROVED',
           chatterAmount,
           recruiterAmount: recruiterId && recruiterAmount > 0 ? recruiterAmount : null,
-          ownerAmount: ownerId && ownerAmount > 0 && ownerId !== recruiterId ? ownerAmount : null,
+          ownerAmount: ownerId && ownerAmount > 0 ? ownerAmount : null,
           adminAmount: adminAmount > 0 ? adminAmount : null
         }
       })
@@ -59,7 +59,7 @@ export async function approveReport(reportId: string, payouts: Payouts) {
       );
     }
     
-    if (recruiterId && recruiterAmount > 0) {
+    if (recruiterId && recruiterAmount > 0 && recruiterId !== ownerId) {
       txs.push(
         prisma.user.update({
           where: { id: recruiterId },
@@ -68,7 +68,6 @@ export async function approveReport(reportId: string, payouts: Payouts) {
       );
     }
 
-    // Don't double pay if recruiter is the owner
     if (ownerId && ownerAmount > 0 && ownerId !== recruiterId) {
       txs.push(
         prisma.user.update({
@@ -76,6 +75,19 @@ export async function approveReport(reportId: string, payouts: Payouts) {
           data: { balance: { increment: ownerAmount } }
         })
       );
+    }
+
+    // If owner is the same as recruiter, combine their increments to avoid transaction conflicts or double-updates overwriting each other
+    if (ownerId && recruiterId === ownerId) {
+      const combinedAmount = (ownerAmount || 0) + (recruiterAmount || 0);
+      if (combinedAmount > 0) {
+        txs.push(
+          prisma.user.update({
+            where: { id: ownerId },
+            data: { balance: { increment: combinedAmount } }
+          })
+        );
+      }
     }
 
     if (adminAmount > 0) {

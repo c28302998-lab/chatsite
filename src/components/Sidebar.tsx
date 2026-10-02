@@ -9,7 +9,8 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  const showWorkersTab = role === 'ADMIN' || role === 'PARTNER';
+  const showWorkersTab = role === 'ADMIN' || (role === 'PARTNER' && (!hasBandId || hasOwnedBand));
+  const showMyBandTab = role === 'PARTNER' && (hasOwnedBand || hasBandId);
 
   const menuItems = role === 'CHATTER'
     ? [
@@ -24,7 +25,7 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
         { name: 'Чатеры', href: '/chatters', icon: UserPlus },
         { name: 'Баланс', href: '/balance', icon: Wallet },
         { name: 'Отчеты', href: '/reports', icon: FileText },
-        ...(role === 'PARTNER' ? [{ name: 'Моя Команда', href: '/my-band', icon: Shield }] : []),
+        ...(showMyBandTab ? [{ name: 'Моя Команда', href: '/my-band', icon: Shield }] : []),
         ...(role === 'ADMIN' ? [
           { name: 'Пользователи', href: '/admin/users', icon: Users },
           { name: 'Финансы (Админ)', href: '/admin/finances', icon: Wallet },

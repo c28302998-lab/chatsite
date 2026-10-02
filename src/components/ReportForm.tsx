@@ -79,7 +79,6 @@ export default function ReportForm() {
               type="number"
               name="profitAmount"
               step="0.01"
-              min="0"
               required
               placeholder="0.00"
               className="w-full bg-black/20 border border-zinc-800 rounded-xl pl-8 pr-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#B9FF66]/50 focus:ring-1 focus:ring-[#B9FF66]/50 transition-all"

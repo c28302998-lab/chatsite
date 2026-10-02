@@ -45,7 +45,6 @@ export default async function Home() {
       });
 
       // Reports/Profit
-      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
 
@@ -55,7 +54,6 @@ export default async function Home() {
         where: {
           ...bandReportsQuery,
           status: 'APPROVED',
-          createdAt: { gte: startOfMonth }
         }
       });
       totalProfit = allReports.reduce((acc, curr) => acc + curr.profitAmount, 0);
@@ -140,7 +138,7 @@ export default async function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Заработано (за месяц)"
+          title="Заработано (за все время)"
           value={`$${totalProfit.toFixed(2)}`}
           icon={DollarSign}
           trend=""

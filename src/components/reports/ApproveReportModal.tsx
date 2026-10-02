@@ -82,7 +82,7 @@ export function ApproveReportModal({ reportId, profitAmount, chatterName, recrui
             </div>
           )}
 
-          {ownerName && ownerName !== recruiterName && (
+          {ownerName && (
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-300 block">
                 Доля Владельца Команды ({ownerName}) $

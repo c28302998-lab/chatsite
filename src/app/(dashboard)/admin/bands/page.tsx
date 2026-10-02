@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 
 async function approveBandRequest(formData: FormData) {
   "use server";
@@ -227,8 +229,9 @@ export default async function AdminBandsPage() {
                 const totalBalance = band.members.reduce((acc, curr) => acc + (curr.balance || 0), 0) + (band.owner?.balance || 0);
 
                 return (
-                  <tr key={band.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-6 py-4 font-medium text-white">
+                  <tr key={band.id} className="hover:bg-white/[0.02] transition-colors group">
+                    <td className="px-6 py-4 font-medium text-white relative">
+                      <Link href={`/admin/bands/${band.id}`} className="absolute inset-0 z-10" />
                       <span className="inline-flex items-center px-2 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
                         BAND
                       </span>
@@ -244,8 +247,9 @@ export default async function AdminBandsPage() {
                     <td className="px-6 py-4 text-right font-medium text-amber-400">
                       ${totalBalance.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-400">
+                    <td className="px-6 py-4 text-right font-bold text-emerald-400 flex items-center justify-end gap-2">
                       ${band.bandProfit.toFixed(2)}
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
                     </td>
                   </tr>
                 );
@@ -257,8 +261,9 @@ export default async function AdminBandsPage() {
                 const totalBalance = partner.balance || 0; // Solo balance
 
                 return (
-                  <tr key={partner.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-6 py-4 font-medium text-slate-300">
+                  <tr key={partner.id} className="hover:bg-white/[0.02] transition-colors group">
+                    <td className="px-6 py-4 font-medium text-slate-300 relative">
+                      <Link href={`/admin/solo/${partner.id}`} className="absolute inset-0 z-10" />
                       <span className="inline-flex items-center px-2 py-1 bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
                         SOLO
                       </span>
@@ -272,8 +277,9 @@ export default async function AdminBandsPage() {
                     <td className="px-6 py-4 text-right font-medium text-amber-400">
                       ${totalBalance.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-400">
+                    <td className="px-6 py-4 text-right font-bold text-emerald-400 flex items-center justify-end gap-2">
                       ${partner.soloProfit.toFixed(2)}
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
                     </td>
                   </tr>
                 );
@@ -283,64 +289,6 @@ export default async function AdminBandsPage() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-white mb-4">Статистика по пользователям (Заработано)</h2>
-        <div className="rounded-2xl border border-zinc-800 bg-[#1C1C1E] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="text-xs uppercase bg-black/20 text-slate-400 border-b border-zinc-800">
-                <tr>
-                  <th className="px-6 py-4 font-semibold">Имя</th>
-                  <th className="px-6 py-4 font-semibold">Email</th>
-                  <th className="px-6 py-4 font-semibold">Роль</th>
-                  <th className="px-6 py-4 font-semibold text-right">Заработано (Профит)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {(() => {
-                  const allUsersStats: any[] = [];
-                  bands.forEach(b => {
-                    if (b.owner) {
-                      const profit = b.owner.reports.reduce((sum, r) => sum + (r.profitAmount || 0), 0);
-                      allUsersStats.push({ id: b.owner.id, name: b.owner.name, email: b.owner.email, role: b.owner.role, profit });
-                    }
-                    b.members.forEach(m => {
-                      const profit = m.reports.reduce((sum, r) => sum + (r.profitAmount || 0), 0);
-                      allUsersStats.push({ id: m.id, name: m.role, email: '-', role: m.role, profit }); // Assuming we don't fetch name/email in members query currently
-                    });
-                  });
-                  soloPartners.forEach(p => {
-                    const profit = p.reports.reduce((sum, r) => sum + (r.profitAmount || 0), 0);
-                    allUsersStats.push({ id: p.id, name: p.name, email: p.email, role: p.role, profit });
-                    p.invitees.forEach(i => {
-                      const profit = i.reports.reduce((sum, r) => sum + (r.profitAmount || 0), 0);
-                      allUsersStats.push({ id: i.id, name: i.role, email: '-', role: i.role, profit }); // Assuming we don't fetch name/email
-                    });
-                  });
-
-                  // Sort by profit descending
-                  allUsersStats.sort((a, b) => b.profit - a.profit);
-
-                  return allUsersStats.map(u => (
-                    <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{u.name || 'Без имени'}</td>
-                      <td className="px-6 py-4 text-slate-400">{u.email}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-slate-500/10 text-slate-400 border-slate-500/20 uppercase">
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-bold text-emerald-400">
-                        ${u.profit.toFixed(2)}
-                      </td>
-                    </tr>
-                  ));
-                })()}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
