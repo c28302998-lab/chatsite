@@ -22,7 +22,11 @@ export async function createBand(formData: FormData) {
       include: { ownedBand: true }
     });
 
-    if (currentUser?.ownedBand) {
+    if (!currentUser) {
+      throw new Error("Пользователь не найден. Пожалуйста, перезайдите в аккаунт.");
+    }
+
+    if (currentUser.ownedBand) {
       throw new Error("У вас уже есть команда");
     }
 
