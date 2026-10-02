@@ -298,7 +298,7 @@ export default async function AdminBandsPage() {
               </thead>
               <tbody className="divide-y divide-zinc-800">
                 {(() => {
-                  const allUsersStats = [];
+                  const allUsersStats: any[] = [];
                   bands.forEach(b => {
                     if (b.owner) {
                       const profit = b.owner.reports.reduce((sum, r) => sum + (r.profitAmount || 0), 0);
