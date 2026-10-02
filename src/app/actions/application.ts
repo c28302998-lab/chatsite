@@ -115,14 +115,14 @@ export async function acceptApplication(id: string) {
   }
 }
 
-export async function updateInterviewDate(id: string, date: Date | null) {
+export async function updateInterviewDate(id: string, date: Date | null, interviewText: string | null = null) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "ADMIN") throw new Error("Нет доступа");
 
     await prisma.application.update({
       where: { id },
-      data: { interviewDate: date },
+      data: { interviewDate: date, interviewText: interviewText },
     });
     
     revalidatePath("/applications");

@@ -166,6 +166,7 @@ export default async function ApplicationsPage() {
                         <InterviewDatePicker 
                           applicationId={app.id}
                           date={app.interviewDate}
+                          interviewText={app.interviewText}
                           role={session?.user?.role as string}
                         />
                       )}

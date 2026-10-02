@@ -81,6 +81,7 @@ model Application {
   
   status        String            @default("IN_PROGRESS")
   interviewDate DateTime?
+  interviewText String?
   inviteToken   String?           @unique
   
   // Автоматически созданный аккаунт

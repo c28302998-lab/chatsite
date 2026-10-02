@@ -123,6 +123,12 @@ export default async function ReportsPage() {
                 <th className="px-6 py-4 font-semibold">Чатер</th>
                 <th className="px-6 py-4 font-semibold">Начало смены</th>
                 <th className="px-6 py-4 font-semibold">Конец смены</th>
+                {currentUser?.role === 'ADMIN' && (
+                  <>
+                    <th className="px-6 py-4 font-semibold">Скриншот</th>
+                    <th className="px-6 py-4 font-semibold">Доступы</th>
+                  </>
+                )}
                 <th className="px-6 py-4 font-semibold text-right">Профит</th>
                 <th className="px-6 py-4 font-semibold">Выплаты</th>
                 <th className="px-6 py-4 font-semibold text-right">Статус</th>
@@ -147,6 +153,28 @@ export default async function ReportsPage() {
                   <td className="px-6 py-4 text-slate-300">
                     {new Date(report.shiftEnd).toLocaleString()}
                   </td>
+                  {currentUser?.role === 'ADMIN' && (
+                    <>
+                      <td className="px-6 py-4">
+                        {report.screenshot ? (
+                          <a href={report.screenshot} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline text-xs">
+                            Скриншот
+                          </a>
+                        ) : (
+                          <span className="text-slate-500 text-xs">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {report.accountAccess ? (
+                          <div className="text-xs bg-black/30 p-2 rounded max-w-[150px] truncate" title={report.accountAccess}>
+                            {report.accountAccess}
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 text-xs">-</span>
+                        )}
+                      </td>
+                    </>
+                  )}
                   <td className="px-6 py-4 font-medium text-emerald-400 text-right">
                     ${report.profitAmount.toFixed(2)}
                   </td>
