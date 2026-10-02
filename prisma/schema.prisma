@@ -45,6 +45,10 @@ model User {
   // Отчеты о сменах (если роль CHATTER)
   reports       Report[]
 
+  // Сообщения чата
+  sentMessages  ChatMessage[] @relation("SentMessages")
+  receivedMessages ChatMessage[] @relation("ReceivedMessages")
+
   // Бонусы и ставки пользователя
   bonusRates    BonusRate[]
 
@@ -128,4 +132,18 @@ model BonusRate {
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  text      String
+  
+  senderId  String
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  
+  receiverId String?
+  receiver   User?   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

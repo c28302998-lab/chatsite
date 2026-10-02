@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import ChatWidget from "../chat/ChatWidget";
 
 export function DashboardWrapper({
   sidebar,
@@ -49,6 +50,8 @@ export function DashboardWrapper({
       <main className="flex-1 md:ml-64 min-h-screen border-l border-white/5 bg-[#030712]/50 pt-16 md:pt-0 w-full overflow-x-hidden">
         {children}
       </main>
+
+      <ChatWidget />
     </div>
   );
 }
