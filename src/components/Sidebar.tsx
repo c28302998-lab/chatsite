@@ -20,13 +20,15 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
     : [
         { name: 'Главная', href: '/', icon: Home },
         { name: 'Заявки', href: '/applications', icon: Briefcase },
-        ...(showWorkersTab ? [{ name: 'Команда', href: '/workers', icon: Users }] : []),
+        ...(showWorkersTab ? [{ name: 'Работники', href: '/workers', icon: Users }] : []),
         { name: 'Чатеры', href: '/chatters', icon: UserPlus },
         { name: 'Баланс', href: '/balance', icon: Wallet },
         { name: 'Отчеты', href: '/reports', icon: FileText },
+        ...(role === 'PARTNER' ? [{ name: 'Моя Команда', href: '/my-band', icon: Shield }] : []),
         ...(role === 'ADMIN' ? [
+          { name: 'Пользователи', href: '/admin/users', icon: Users },
           { name: 'Финансы (Админ)', href: '/admin/finances', icon: Wallet },
-          { name: 'Составы', href: '/admin/bands', icon: Shield },
+          { name: 'Команды', href: '/admin/bands', icon: Shield },
           { name: 'Бонусы и Ставки', href: '/admin/bonuses', icon: Gift }
         ] : []),
         { name: 'Настройки', href: '/settings', icon: Settings },

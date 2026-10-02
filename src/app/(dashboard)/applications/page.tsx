@@ -17,11 +17,27 @@ export default async function ApplicationsPage() {
         include: { recruiter: true },
         orderBy: { createdAt: 'desc' }
       });
+    } else if (session.user.role === 'PARTNER') {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { ownedBand: true }
+      });
+      applications = await prisma.application.findMany({
+        where: {
+          OR: [
+            { recruiterId: session.user.id },
+            { recruiter: { bandId: user?.ownedBand?.id } }
+          ]
+        },
+        include: { recruiter: true },
+        orderBy: { createdAt: 'desc' }
+      });
     } else {
       applications = await prisma.application.findMany({
         where: {
           recruiterId: session.user.id
         },
+        include: { recruiter: true },
         orderBy: { createdAt: 'desc' }
       });
     }
@@ -44,19 +60,20 @@ export default async function ApplicationsPage() {
   }
 
   const getStatusBadge = (status: string) => {
+    const baseClasses = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap";
     switch (status) {
       case 'IN_PROGRESS':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-amber-500/10 text-amber-500 border-amber-500/20">В работе</span>;
+        return <span className={`${baseClasses} bg-amber-500/10 text-amber-500 border-amber-500/20`}>В работе</span>;
       case 'INTERVIEW_SCHEDULED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-blue-500/10 text-blue-400 border-blue-500/20">Собеседование</span>;
+        return <span className={`${baseClasses} bg-blue-500/10 text-blue-400 border-blue-500/20`}>Собеседование</span>;
       case 'INTERNSHIP':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-purple-500/10 text-purple-400 border-purple-500/20">Стажировка</span>;
+        return <span className={`${baseClasses} bg-purple-500/10 text-purple-400 border-purple-500/20`}>Стажировка</span>;
       case 'HIRED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Нанят</span>;
+        return <span className={`${baseClasses} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>Нанят</span>;
       case 'REJECTED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-red-500/10 text-red-400 border-red-500/20">Отказ</span>;
+        return <span className={`${baseClasses} bg-red-500/10 text-red-400 border-red-500/20`}>Отказ</span>;
       default:
-        return <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-slate-500/10 text-slate-400 border-slate-500/20">{status}</span>;
+        return <span className={`${baseClasses} bg-slate-500/10 text-slate-400 border-slate-500/20`}>{status}</span>;
     }
   };
 
@@ -114,7 +131,7 @@ export default async function ApplicationsPage() {
               <tr>
                 <th className="px-6 py-4 font-semibold">Имя</th>
                 <th className="px-6 py-4 font-semibold">Telegram</th>
-                {session?.user?.role === 'ADMIN' && (
+                {(session?.user?.role === 'ADMIN' || session?.user?.role === 'PARTNER') && (
                   <th className="px-6 py-4 font-semibold">Рекрутер</th>
                 )}
                 <th className="px-6 py-4 font-semibold">Телефон</th>
@@ -126,7 +143,7 @@ export default async function ApplicationsPage() {
             <tbody className="divide-y divide-zinc-800">
               {applications.length === 0 && (
                 <tr>
-                  <td colSpan={session?.user?.role === 'ADMIN' ? 7 : 6} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={(session?.user?.role === 'ADMIN' || session?.user?.role === 'PARTNER') ? 7 : 6} className="px-6 py-8 text-center text-slate-500">
                     Заявок пока нет
                   </td>
                 </tr>
@@ -135,7 +152,7 @@ export default async function ApplicationsPage() {
                 <tr key={app.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-6 py-4 font-medium text-white">{app.name}</td>
                   <td className="px-6 py-4 text-amber-300">{app.telegram || '-'}</td>
-                  {session?.user?.role === 'ADMIN' && (
+                  {(session?.user?.role === 'ADMIN' || session?.user?.role === 'PARTNER') && (
                     <td className="px-6 py-4">
                       <div className="text-white">{app.recruiter?.name || 'Без имени'}</div>
                       <div className="text-xs text-slate-500">{app.recruiter?.email}</div>

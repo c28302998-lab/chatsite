@@ -52,6 +52,9 @@ model User {
   // Бонусы и ставки пользователя
   bonusRates    BonusRate[]
 
+  // Запросы на создание команды
+  bandRequests  BandRequest[]
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -146,4 +149,14 @@ model ChatMessage {
   
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model BandRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  bandName    String
+  description String
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now())
 }
