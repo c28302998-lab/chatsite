@@ -22,7 +22,10 @@ export default async function WorkersPage() {
             owner: true
           }
         },
-        invitees: true 
+        invitees: true,
+        bandRequests: {
+          orderBy: { createdAt: 'desc' }
+        }
       }
     });
 
