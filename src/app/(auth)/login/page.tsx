@@ -23,7 +23,11 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      setError("Неверный email или пароль");
+      if (res.error === "Ваш аккаунт еще не подтвержден администратором") {
+        setError(res.error);
+      } else {
+        setError("Неверный email или пароль");
+      }
     } else {
       router.push("/");
       router.refresh();

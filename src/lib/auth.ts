@@ -32,6 +32,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
+        if (user.status !== "ACTIVE") {
+          throw new Error("Ваш аккаунт еще не подтвержден администратором");
+        }
+
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
