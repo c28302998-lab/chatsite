@@ -32,6 +32,7 @@ export async function deleteWorker(workerId: string) {
       prisma.chatMessage.deleteMany({ where: { OR: [{ senderId: workerId }, { receiverId: workerId }] } }),
       prisma.application.deleteMany({ where: { recruiterId: workerId } }),
       prisma.user.updateMany({ where: { invitedById: workerId }, data: { invitedById: null } }),
+      prisma.bandRequest.deleteMany({ where: { userId: workerId } }),
       prisma.user.delete({ where: { id: workerId } })
     ]);
 

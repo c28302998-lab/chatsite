@@ -24,6 +24,8 @@ export function ChatterActions({
     const res = await approveChatter(chatterId);
     if (res.success) {
       router.refresh();
+    } else {
+      alert(res.error || "Произошла ошибка");
     }
     setLoading(false);
   };
@@ -34,6 +36,8 @@ export function ChatterActions({
     const res = await deleteChatter(chatterId);
     if (res.success) {
       router.refresh();
+    } else {
+      alert(res.error || "Произошла ошибка");
     }
     setLoading(false);
   };

@@ -231,30 +231,39 @@ export default async function AdminBandsPage() {
                 return (
                   <tr 
                     key={band.id} 
-                    onClick={() => { window.location.href = `/admin/bands/${band.id}`; }}
-                    className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                    className="hover:bg-white/[0.02] transition-colors group"
                   >
-                    <td className="px-6 py-4 font-medium text-white">
-                      <div className="flex items-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
-                          BAND
-                        </span>
-                        {band.name}
-                      </div>
+                    <td className="p-0 font-medium text-white">
+                      <Link href={`/admin/bands/${band.id}`} className="block px-6 py-4 w-full h-full">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center px-2 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
+                            BAND
+                          </span>
+                          {band.name}
+                        </div>
+                      </Link>
                     </td>
-                    <td className="px-6 py-4">
-                      {band.owner?.name || 'Без имени'}
-                      <div className="text-xs text-slate-500">{band.owner?.email}</div>
+                    <td className="p-0">
+                      <Link href={`/admin/bands/${band.id}`} className="block px-6 py-4 w-full h-full">
+                        {band.owner?.name || 'Без имени'}
+                        <div className="text-xs text-slate-500">{band.owner?.email}</div>
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 text-center font-medium text-blue-400">
-                      {total}
+                    <td className="p-0 text-center font-medium text-blue-400">
+                      <Link href={`/admin/bands/${band.id}`} className="block px-6 py-4 w-full h-full">
+                        {total}
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 text-right font-medium text-amber-400">
-                      ${totalBalance.toFixed(2)}
+                    <td className="p-0 text-right font-medium text-amber-400">
+                      <Link href={`/admin/bands/${band.id}`} className="block px-6 py-4 w-full h-full">
+                        ${totalBalance.toFixed(2)}
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-400 flex items-center justify-end gap-2">
-                      ${band.bandProfit.toFixed(2)}
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                    <td className="p-0 text-right font-bold text-emerald-400">
+                      <Link href={`/admin/bands/${band.id}`} className="flex items-center justify-end gap-2 px-6 py-4 w-full h-full">
+                        ${band.bandProfit.toFixed(2)}
+                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                      </Link>
                     </td>
                   </tr>
                 );
@@ -268,28 +277,39 @@ export default async function AdminBandsPage() {
                 return (
                   <tr 
                     key={partner.id} 
-                    onClick={() => { window.location.href = `/admin/solo/${partner.id}`; }}
-                    className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                    className="hover:bg-white/[0.02] transition-colors group"
                   >
-                    <td className="px-6 py-4 font-medium text-slate-300">
-                      <div className="flex items-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
-                          SOLO
-                        </span>
-                        {partner.name || 'Одиночный админ'}
-                      </div>
+                    <td className="p-0 font-medium text-slate-300">
+                      <Link href={`/admin/solo/${partner.id}`} className="block px-6 py-4 w-full h-full">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center px-2 py-1 bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-md text-[10px] uppercase font-bold mr-2">
+                            SOLO
+                          </span>
+                          {partner.name || 'Одиночный админ'}
+                        </div>
+                      </Link>
                     </td>
-                    <td className="px-6 py-4">
-                      {partner.name || 'Без имени'}
-                      <div className="text-xs text-slate-500">{partner.email}</div>
+                    <td className="p-0">
+                      <Link href={`/admin/solo/${partner.id}`} className="block px-6 py-4 w-full h-full">
+                        {partner.name || 'Без имени'}
+                        <div className="text-xs text-slate-500">{partner.email}</div>
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 text-center font-medium text-slate-500">{total}</td>
-                    <td className="px-6 py-4 text-right font-medium text-amber-400">
-                      ${totalBalance.toFixed(2)}
+                    <td className="p-0 text-center font-medium text-slate-500">
+                      <Link href={`/admin/solo/${partner.id}`} className="block px-6 py-4 w-full h-full">
+                        {total}
+                      </Link>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-400 flex items-center justify-end gap-2">
-                      ${partner.soloProfit.toFixed(2)}
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                    <td className="p-0 text-right font-medium text-amber-400">
+                      <Link href={`/admin/solo/${partner.id}`} className="block px-6 py-4 w-full h-full">
+                        ${totalBalance.toFixed(2)}
+                      </Link>
+                    </td>
+                    <td className="p-0 text-right font-bold text-emerald-400">
+                      <Link href={`/admin/solo/${partner.id}`} className="flex items-center justify-end gap-2 px-6 py-4 w-full h-full">
+                        ${partner.soloProfit.toFixed(2)}
+                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                      </Link>
                     </td>
                   </tr>
                 );

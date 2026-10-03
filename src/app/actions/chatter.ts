@@ -126,6 +126,8 @@ export async function deleteChatter(chatterId: string) {
       prisma.bonusRate.deleteMany({ where: { userId: chatterId } }),
       prisma.chatMessage.deleteMany({ where: { OR: [{ senderId: chatterId }, { receiverId: chatterId }] } }),
       prisma.application.updateMany({ where: { userId: chatterId }, data: { userId: null } }),
+      prisma.user.updateMany({ where: { invitedById: chatterId }, data: { invitedById: null } }),
+      prisma.bandRequest.deleteMany({ where: { userId: chatterId } }),
       prisma.user.delete({ where: { id: chatterId } })
     ]);
 

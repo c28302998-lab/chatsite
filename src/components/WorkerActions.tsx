@@ -15,6 +15,8 @@ export function WorkerActions({ workerId }: { workerId: string }) {
     const res = await deleteWorker(workerId);
     if (res.success) {
       router.refresh();
+    } else {
+      alert(res.error || "Произошла ошибка");
     }
     setLoading(false);
   };

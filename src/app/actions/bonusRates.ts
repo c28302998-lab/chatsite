@@ -94,3 +94,42 @@ export async function approveBonus(bonusId: string) {
     return { success: false, error: error.message };
   }
 }
+
+export async function deleteBonus(bonusId: string, deductAmount: boolean) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') {
+      throw new Error("Только Главный Админ может удалять ставки");
+    }
+
+    const bonus = await prisma.bonusRate.findUnique({
+      where: { id: bonusId }
+    });
+
+    if (!bonus) {
+      throw new Error("Ставка не найдена");
+    }
+
+    if (deductAmount && bonus.status === "APPROVED") {
+      await prisma.$transaction([
+        prisma.user.update({
+          where: { id: bonus.userId },
+          data: { balance: { decrement: bonus.amount } }
+        }),
+        prisma.bonusRate.delete({
+          where: { id: bonusId }
+        })
+      ]);
+    } else {
+      await prisma.bonusRate.delete({
+        where: { id: bonusId }
+      });
+    }
+
+    revalidatePath("/admin/bonuses");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting bonus:", error);
+    return { success: false, error: error.message };
+  }
+}

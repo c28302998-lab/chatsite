@@ -7,22 +7,7 @@ import { redirect } from 'next/navigation';
 import { CreateBonusForm } from '@/components/bonuses/CreateBonusForm';
 import { approveBonus } from '@/app/actions/bonusRates';
 
-// Helper component for admin action
-function AdminBonusActions({ bonusId }: { bonusId: string }) {
-  return (
-    <form action={async () => {
-      'use server';
-      await approveBonus(bonusId);
-    }}>
-      <button 
-        type="submit"
-        className="px-3 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full hover:bg-emerald-500/20 transition-colors"
-      >
-        Оплатить
-      </button>
-    </form>
-  );
-}
+import { AdminBonusActions } from '@/components/bonuses/AdminBonusActions';
 
 export default async function AdminBonusesPage() {
   const session = await getServerSession(authOptions);
@@ -108,9 +93,12 @@ export default async function AdminBonusesPage() {
                       {b.reportText || '—'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {b.status === 'PENDING_REVIEW' && (
-                        <AdminBonusActions bonusId={b.id} />
-                      )}
+                      <AdminBonusActions 
+                        bonusId={b.id} 
+                        status={b.status}
+                        amount={b.amount}
+                        userName={b.user?.name || 'Без имени'}
+                      />
                     </td>
                   </tr>
                 ))}
