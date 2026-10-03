@@ -54,6 +54,17 @@ export default async function WorkersPage() {
           invitees: true 
         }
       });
+    } else if (owner?.role === 'PARTNER') {
+      // Для одиночек показываем их приглашенных саб-рекрутеров
+      workers = await prisma.user.findMany({
+        where: {
+          invitedById: owner.id,
+          role: 'PARTNER'
+        },
+        include: {
+          invitees: true 
+        }
+      });
     }
   }
 
@@ -195,22 +206,22 @@ export default async function WorkersPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {session?.user?.id && owner?.ownedBand && (
-             <ReferralLink userId={session.user.id} bandId={owner.ownedBand.id} role="PARTNER" text="Пригласить рекрутера" />
+          {session?.user?.id && owner?.role === 'PARTNER' && (
+             <ReferralLink userId={session.user.id} bandId={owner.ownedBand?.id} role="PARTNER" text="Пригласить рекрутера" />
           )}
           {owner?.role !== 'ADMIN' && <AddWorkerDialog />}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {owner?.ownedBand && (
+        {owner?.role === 'PARTNER' && (
           <Card className="bg-[#1C1C1E] border-zinc-800 p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-indigo-500/20 rounded-xl">
                 <Users className="w-6 h-6 text-indigo-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-400">Создатель команды</p>
+                <p className="text-sm font-medium text-slate-400">{owner.ownedBand ? 'Создатель команды' : 'Одиночный рекрутер'}</p>
                 <p className="text-xl font-bold text-white truncate">{owner.name || 'Вы'}</p>
                 <p className="text-xs text-slate-500 mt-1">{owner.email}</p>
               </div>
@@ -230,7 +241,7 @@ export default async function WorkersPage() {
           </div>
         </Card>
 
-        {owner?.ownedBand && (
+        {owner?.role === 'PARTNER' && (
           <Card className="bg-[#1C1C1E] border-zinc-800 p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-emerald-500/20 rounded-xl">

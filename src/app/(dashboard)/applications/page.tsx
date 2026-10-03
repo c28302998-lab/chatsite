@@ -43,21 +43,8 @@ export default async function ApplicationsPage() {
     }
   }
 
-  // Проверяем наличие команды для отображения кнопки "Новая заявка"
-  let hasTeam = false;
-  if (session?.user?.role === 'ADMIN') {
-    hasTeam = true;
-  } else if (session?.user?.id) {
-    const userWithBand = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: { ownedBand: true }
-    });
-    if (session.user.role === 'PARTNER' && userWithBand?.ownedBand) {
-      hasTeam = true;
-    } else if (session.user.role === 'WORKER' && userWithBand?.bandId) {
-      hasTeam = true;
-    }
-  }
+  // Все авторизованные рекрутеры могут добавлять заявки (включая одиночек)
+  const hasTeam = true;
 
   const getStatusBadge = (status: string) => {
     const baseClasses = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap";

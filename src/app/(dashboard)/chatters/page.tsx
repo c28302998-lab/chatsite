@@ -55,6 +55,13 @@ export default async function ChattersPage() {
           include: { invitedBy: true },
           orderBy: { createdAt: 'desc' }
         });
+      } else {
+        // Одиночки видят только своих приглашенных чатеров
+        chatters = await prisma.user.findMany({
+          where: { invitedById: currentUserId, role: 'CHATTER' },
+          include: { invitedBy: true },
+          orderBy: { createdAt: 'desc' }
+        });
       }
     }
   }
@@ -83,7 +90,7 @@ export default async function ChattersPage() {
           <h1 className="text-3xl font-bold text-white tracking-tight">Чатеры</h1>
           <p className="text-slate-400 mt-1">Управление чатерами вашей банды.</p>
         </div>
-        {currentUserId && bandId && (
+        {currentUserId && (
           <ReferralLink userId={currentUserId} bandId={bandId} />
         )}
       </div>

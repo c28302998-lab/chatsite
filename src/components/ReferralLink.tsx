@@ -5,7 +5,7 @@ import { Link2, Check } from "lucide-react";
 
 interface ReferralLinkProps {
   userId: string;
-  bandId: string;
+  bandId?: string | null;
   role?: string;
   text?: string;
 }
@@ -16,7 +16,11 @@ export function ReferralLink({ userId, bandId, role = "CHATTER", text = "Ско�
 
   useEffect(() => {
     // Формируем ссылку только на клиенте, чтобы был доступен window.location.origin
-    setLink(`${window.location.origin}/register?inviteBy=${userId}&bandId=${bandId}&role=${role}`);
+    let url = `${window.location.origin}/register?inviteBy=${userId}&role=${role}`;
+    if (bandId) {
+      url += `&bandId=${bandId}`;
+    }
+    setLink(url);
   }, [userId, bandId, role]);
 
   const copyToClipboard = () => {
