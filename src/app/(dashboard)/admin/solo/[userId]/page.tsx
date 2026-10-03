@@ -6,15 +6,17 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Users, DollarSign, Wallet } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function AdminSoloDetailPage({ params }: { params: { userId: string } }) {
+export default async function AdminSoloDetailPage({ params }: { params: Promise<{ userId: string }> }) {
   const session = await getServerSession(authOptions);
   
   if (session?.user?.role !== 'ADMIN') {
     redirect('/');
   }
 
+  const { userId } = await params;
+
   const partner = await prisma.user.findUnique({
-    where: { id: params.userId },
+    where: { id: userId },
     include: {
       reports: { where: { status: 'APPROVED' } },
       applications: true,

@@ -6,15 +6,17 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Users, DollarSign, Wallet } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function AdminBandDetailPage({ params }: { params: { bandId: string } }) {
+export default async function AdminBandDetailPage({ params }: { params: Promise<{ bandId: string }> }) {
   const session = await getServerSession(authOptions);
   
   if (session?.user?.role !== 'ADMIN') {
     redirect('/');
   }
 
+  const { bandId } = await params;
+
   const band = await prisma.band.findUnique({
-    where: { id: params.bandId },
+    where: { id: bandId },
     include: {
       owner: {
         include: {
@@ -36,7 +38,7 @@ export default async function AdminBandDetailPage({ params }: { params: { bandId
 
   // Calculate totals
   let ownerProfit = 0;
-  band.owner?.reports.forEach(r => ownerProfit += (r.profitAmount || 0));
+  band.owner?.reports?.forEach(r => ownerProfit += (r.profitAmount || 0));
 
   let totalMembersProfit = 0;
   const membersWithProfit = band.members.map(m => {
