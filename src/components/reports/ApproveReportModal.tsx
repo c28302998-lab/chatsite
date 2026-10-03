@@ -19,7 +19,7 @@ export function ApproveReportModal({ reportId, profitAmount, chatterName, recrui
   const [ownerAmount, setOwnerAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
-  const adminAmount = Math.max(0, profitAmount - chatterAmount - recruiterAmount - ownerAmount);
+  const adminAmount = profitAmount - chatterAmount - recruiterAmount - ownerAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

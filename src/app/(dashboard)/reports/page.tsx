@@ -182,9 +182,9 @@ export default async function ReportsPage() {
                     {report.status === 'APPROVED' ? (
                       <div className="flex flex-col gap-1 text-xs">
                         {report.chatterAmount != null && <span className="text-emerald-400">Чатер: ${report.chatterAmount.toFixed(2)}</span>}
-                        {report.recruiterAmount != null && <span className="text-indigo-400">Рекрутер: ${report.recruiterAmount.toFixed(2)}</span>}
-                        {report.ownerAmount != null && <span className="text-amber-400">Владелец: ${report.ownerAmount.toFixed(2)}</span>}
-                        {report.adminAmount != null && <span className="text-purple-400">Платформа: ${report.adminAmount.toFixed(2)}</span>}
+                        {report.recruiterAmount != null && currentUser?.role !== 'CHATTER' && <span className="text-indigo-400">Рекрутер: ${report.recruiterAmount.toFixed(2)}</span>}
+                        {report.ownerAmount != null && (currentUser?.role === 'ADMIN' || (currentUser?.role === 'PARTNER' && currentUser.ownedBand)) && <span className="text-amber-400">Владелец: ${report.ownerAmount.toFixed(2)}</span>}
+                        {report.adminAmount != null && currentUser?.role === 'ADMIN' && <span className="text-purple-400">Платформа: ${report.adminAmount.toFixed(2)}</span>}
                       </div>
                     ) : (
                       <span className="text-slate-500 text-xs">Не рассчитано</span>

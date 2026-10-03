@@ -45,7 +45,7 @@ export async function approveReport(reportId: string, payouts: Payouts) {
           chatterAmount,
           recruiterAmount: recruiterId && recruiterAmount > 0 ? recruiterAmount : null,
           ownerAmount: ownerId && ownerAmount > 0 ? ownerAmount : null,
-          adminAmount: adminAmount > 0 ? adminAmount : null
+          adminAmount: adminAmount !== 0 ? adminAmount : null
         }
       })
     ];
@@ -90,7 +90,7 @@ export async function approveReport(reportId: string, payouts: Payouts) {
       }
     }
 
-    if (adminAmount > 0) {
+    if (adminAmount !== 0) {
       txs.push(
         prisma.user.update({
           where: { id: session.user.id },
