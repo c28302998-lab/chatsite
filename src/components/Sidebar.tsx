@@ -28,7 +28,7 @@ export default function Sidebar({ hasOwnedBand, hasBandId, role }: { hasOwnedBan
         ...(showMyBandTab ? [{ name: 'Моя Команда', href: '/my-band', icon: Shield }] : []),
         ...(role === 'ADMIN' ? [
           { name: 'Пользователи', href: '/admin/users', icon: Users },
-          { name: 'Финансы (Админ)', href: '/admin/finances', icon: Wallet },
+          { name: 'Балансы пользователей', href: '/admin/finances', icon: Wallet },
           { name: 'Команды', href: '/admin/bands', icon: Shield },
           { name: 'Бонусы и Ставки', href: '/admin/bonuses', icon: Gift }
         ] : []),

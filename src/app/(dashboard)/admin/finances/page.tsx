@@ -29,7 +29,7 @@ export default async function AdminFinancesPage() {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Финансы (Админ)</h1>
+        <h1 className="text-3xl font-bold text-white tracking-tight">Балансы пользователей</h1>
         <p className="text-slate-400 mt-1">Управление балансами и выплатами пользователей.</p>
       </div>
 
