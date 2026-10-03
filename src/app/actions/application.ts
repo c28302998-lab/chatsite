@@ -92,7 +92,7 @@ export async function acceptApplication(id: string) {
     const cleanTg = application.telegram?.replace(/[^a-zA-Z0-9]/g, "") || "";
     const randomSuffix = Math.floor(Math.random() * 10000);
     const generatedEmail = `${cleanTg || cleanPhone || "chatter"}_${randomSuffix}@lunery.app`.toLowerCase();
-    const generatedPassword = "123456"; // Default password
+    const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4);
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
     // Create User
