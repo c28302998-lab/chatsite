@@ -198,18 +198,64 @@ export async function sendToCalculation(reportId: string) {
   }
 }
 
-export async function deleteReport(reportId: string) {
+export async function deleteReport(reportId: string, payoutsToDeduct?: Payouts) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'ADMIN') {
       throw new Error("Только Главный Админ может удалять отчеты");
     }
 
-    await prisma.report.delete({
-      where: { id: reportId }
-    });
+    if (payoutsToDeduct) {
+      // Need to know who exactly to deduct from
+      const report = await prisma.report.findUnique({
+        where: { id: reportId },
+        include: { chatter: { include: { band: true } } }
+      });
+
+      if (report && report.status === 'APPROVED') {
+        const chatterId = report.chatterId;
+        const recruiterId = report.chatter.invitedById;
+        const ownerId = report.chatter.band?.ownerId;
+        
+        const txs: any[] = [];
+        
+        if (payoutsToDeduct.chatterAmount !== 0) {
+          txs.push(prisma.user.update({ where: { id: chatterId }, data: { balance: { decrement: payoutsToDeduct.chatterAmount } } }));
+        }
+        
+        if (recruiterId && payoutsToDeduct.recruiterAmount !== 0 && recruiterId !== ownerId) {
+          txs.push(prisma.user.update({ where: { id: recruiterId }, data: { balance: { decrement: payoutsToDeduct.recruiterAmount } } }));
+        }
+        
+        if (ownerId && payoutsToDeduct.ownerAmount !== 0 && ownerId !== recruiterId) {
+          txs.push(prisma.user.update({ where: { id: ownerId }, data: { balance: { decrement: payoutsToDeduct.ownerAmount } } }));
+        }
+        
+        if (ownerId && recruiterId === ownerId) {
+          const combined = (payoutsToDeduct.ownerAmount || 0) + (payoutsToDeduct.recruiterAmount || 0);
+          if (combined !== 0) {
+            txs.push(prisma.user.update({ where: { id: ownerId }, data: { balance: { decrement: combined } } }));
+          }
+        }
+        
+        if (payoutsToDeduct.adminAmount !== 0) {
+          txs.push(prisma.user.update({ where: { id: session.user.id }, data: { balance: { decrement: payoutsToDeduct.adminAmount } } }));
+        }
+
+        txs.push(prisma.report.delete({ where: { id: reportId } }));
+        
+        await prisma.$transaction(txs);
+      } else {
+        await prisma.report.delete({ where: { id: reportId } });
+      }
+    } else {
+      await prisma.report.delete({
+        where: { id: reportId }
+      });
+    }
 
     revalidatePath("/reports");
+    revalidatePath("/");
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting report:", error);

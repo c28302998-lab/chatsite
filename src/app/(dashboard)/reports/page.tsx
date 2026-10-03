@@ -201,6 +201,10 @@ export default async function ReportsPage() {
                       ownerName={report.chatter?.band?.owner?.name || ''}
                       accountAccess={report.accountAccess}
                       screenshot={report.screenshot}
+                      chatterAmount={report.chatterAmount}
+                      recruiterAmount={report.recruiterAmount}
+                      ownerAmount={report.ownerAmount}
+                      adminAmount={report.adminAmount}
                     />
                   </td>
                 </tr>
