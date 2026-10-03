@@ -63,27 +63,43 @@ export function ReportActions({
   // Already processed statuses
   if (status === "APPROVED" || status === "REJECTED") {
     return (
-      <div className="flex items-center justify-end gap-2">
-        <span
-          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-            status === "APPROVED"
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-          }`}
-        >
-          {status === "APPROVED" ? "Оплачено" : "Отклонено"}
-        </span>
-        {userRole === "ADMIN" && (
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            disabled={loading}
-            title="Удалить отчет"
-            className="p-1.5 text-red-500/70 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
+      <>
+        <div className="flex items-center justify-end gap-2">
+          <span
+            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
+              status === "APPROVED"
+                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+            }`}
           >
-            <Trash className="w-4 h-4" />
-          </button>
+            {status === "APPROVED" ? "Оплачено" : "Отклонено"}
+          </span>
+          {userRole === "ADMIN" && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              disabled={loading}
+              title="Удалить отчет"
+              className="p-1.5 text-red-500/70 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
+            >
+              <Trash className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        {showDeleteModal && (
+          <DeleteReportModal
+            reportId={reportId}
+            status={status}
+            chatterAmount={chatterAmount ?? null}
+            recruiterAmount={recruiterAmount ?? null}
+            ownerAmount={ownerAmount ?? null}
+            adminAmount={adminAmount ?? null}
+            chatterName={chatterName}
+            recruiterName={recruiterName}
+            ownerName={ownerName}
+            onClose={() => setShowDeleteModal(false)}
+          />
         )}
-      </div>
+      </>
     );
   }
 
