@@ -160,3 +160,20 @@ export async function rejectApplication(id: string) {
     return { success: false, error: error.message };
   }
 }
+export async function deleteApplication(id: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      throw new Error("Нет доступа. Только Администратор может удалять заявки.");
+    }
+
+    await prisma.application.delete({
+      where: { id },
+    });
+
+    revalidatePath("/applications");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

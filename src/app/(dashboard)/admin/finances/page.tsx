@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { EditBalanceBtn } from '@/components/admin/EditBalanceBtn';
 
 export default async function AdminFinancesPage() {
   const session = await getServerSession(authOptions);
@@ -85,8 +86,8 @@ export default async function AdminFinancesPage() {
                   <td className="px-6 py-4 text-zinc-400">
                     {u.cryptoExchange || '—'}
                   </td>
-                  <td className="px-6 py-4 text-right font-bold text-[#B9FF66]">
-                    ${u.balance.toFixed(2)}
+                  <td className="px-6 py-4 text-right">
+                    <EditBalanceBtn userId={u.id} currentBalance={u.balance} />
                   </td>
                 </tr>
               ))}

@@ -26,10 +26,16 @@ export async function deleteWorker(workerId: string) {
       return { success: false, error: "Not authorized" };
     }
 
-    await prisma.user.delete({
-      where: { id: workerId }
-    });
+    await prisma.$transaction([
+      prisma.report.deleteMany({ where: { chatterId: workerId } }),
+      prisma.bonusRate.deleteMany({ where: { userId: workerId } }),
+      prisma.chatMessage.deleteMany({ where: { OR: [{ senderId: workerId }, { receiverId: workerId }] } }),
+      prisma.application.deleteMany({ where: { recruiterId: workerId } }),
+      prisma.user.updateMany({ where: { invitedById: workerId }, data: { invitedById: null } }),
+      prisma.user.delete({ where: { id: workerId } })
+    ]);
 
+    revalidatePath("/workers");
     return { success: true };
   } catch (error: any) {
     console.error(error);

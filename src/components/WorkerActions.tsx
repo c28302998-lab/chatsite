@@ -24,7 +24,7 @@ export function WorkerActions({ workerId }: { workerId: string }) {
       onClick={handleDelete}
       disabled={loading}
       title="Удалить рекрутера"
-      className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+      className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
     >
       {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
     </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, Copy, CheckCircle2 } from "lucide-react";
+import { Check, X, Copy, CheckCircle2, Trash } from "lucide-react";
 import { acceptApplication, rejectApplication } from "@/app/actions/application";
 
 interface Props {
@@ -56,7 +56,7 @@ export function ApplicationActions({ applicationId, status, inviteToken, generat
 
   if (status === "HIRED") {
     return (
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <button 
           onClick={showCredentials}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-lg text-xs font-medium transition-colors border border-amber-500/20"
@@ -64,32 +64,66 @@ export function ApplicationActions({ applicationId, status, inviteToken, generat
           <Copy className="w-3.5 h-3.5" />
           Доступы
         </button>
+        {role === "ADMIN" && (
+          <button
+            onClick={async () => {
+              if (confirm("Точно удалить заявку навсегда?")) {
+                setLoading(true);
+                const { deleteApplication } = await import("@/app/actions/application");
+                await deleteApplication(applicationId);
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="p-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors"
+            title="Удалить заявку"
+          >
+            <Trash className="w-4 h-4" />
+          </button>
+        )}
       </div>
     );
   }
 
-  if (status !== "HIRED" && status !== "REJECTED") {
-    return (
-      <div className="flex items-center justify-end gap-2">
-        <button 
-          onClick={handleAccept}
-          disabled={loading}
-          className="p-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors"
-          title="Принять (Нанять)"
-        >
-          <Check className="w-4 h-4" />
-        </button>
-        <button 
-          onClick={handleReject}
+  return (
+    <div className="flex items-center justify-end gap-2">
+      {status !== "HIRED" && status !== "REJECTED" && (
+        <>
+          <button 
+            onClick={handleAccept}
+            disabled={loading}
+            className="p-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors"
+            title="Принять (Нанять)"
+          >
+            <Check className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={handleReject}
+            disabled={loading}
+            className="p-1.5 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 rounded-lg transition-colors"
+            title="Отклонить"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </>
+      )}
+      {role === "ADMIN" && (
+        <button
+          onClick={async () => {
+            if (confirm("Точно удалить заявку навсегда?")) {
+              setLoading(true);
+              const { deleteApplication } = await import("@/app/actions/application");
+              await deleteApplication(applicationId);
+              setLoading(false);
+            }
+          }}
           disabled={loading}
           className="p-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors"
-          title="Отклонить"
+          title="Удалить заявку"
         >
-          <X className="w-4 h-4" />
+          <Trash className="w-4 h-4" />
         </button>
-      </div>
-    );
-  }
-
-  return null;
+      )}
+    </div>
+  );
 }

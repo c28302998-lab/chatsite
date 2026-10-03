@@ -197,3 +197,23 @@ export async function sendToCalculation(reportId: string) {
     return { success: false, error: error.message };
   }
 }
+
+export async function deleteReport(reportId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') {
+      throw new Error("Только Главный Админ может удалять отчеты");
+    }
+
+    await prisma.report.delete({
+      where: { id: reportId }
+    });
+
+    revalidatePath("/reports");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting report:", error);
+    return { success: false, error: error.message };
+  }
+}
+

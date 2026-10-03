@@ -121,9 +121,13 @@ export async function deleteChatter(chatterId: string) {
       throw new Error("Нет прав");
     }
 
-    await prisma.user.delete({
-      where: { id: chatterId }
-    });
+    await prisma.$transaction([
+      prisma.report.deleteMany({ where: { chatterId } }),
+      prisma.bonusRate.deleteMany({ where: { userId: chatterId } }),
+      prisma.chatMessage.deleteMany({ where: { OR: [{ senderId: chatterId }, { receiverId: chatterId }] } }),
+      prisma.application.updateMany({ where: { userId: chatterId }, data: { userId: null } }),
+      prisma.user.delete({ where: { id: chatterId } })
+    ]);
 
     revalidatePath("/chatters");
     return { success: true };

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { approveReport, rejectReport, sendToCalculation } from "@/app/actions/reports";
-import { X, CheckCircle, Clock } from "lucide-react";
+import { X, CheckCircle, Clock, Trash } from "lucide-react";
 import { ApproveReportModal } from "./ApproveReportModal";
 
 interface ReportActionsProps {
@@ -137,6 +137,24 @@ export function ReportActions({
           ownerName={ownerName}
           onClose={handleApproveSuccess}
         />
+      )}
+      
+      {userRole === "ADMIN" && (
+        <button
+          onClick={async () => {
+            if (confirm("Точно удалить этот отчет навсегда?")) {
+              setLoading(true);
+              const { deleteReport } = await import("@/app/actions/reports");
+              await deleteReport(reportId);
+              setLoading(false);
+            }
+          }}
+          disabled={loading}
+          title="Удалить отчет"
+          className="ml-2 p-1.5 text-red-500/70 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
+        >
+          <Trash className="w-4 h-4" />
+        </button>
       )}
     </>
   );
