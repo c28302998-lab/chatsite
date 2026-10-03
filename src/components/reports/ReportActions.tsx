@@ -13,6 +13,8 @@ interface ReportActionsProps {
   chatterName?: string;
   recruiterName?: string;
   ownerName?: string;
+  accountAccess?: string | null;
+  screenshot?: string | null;
 }
 
 export function ReportActions({ 
@@ -22,7 +24,9 @@ export function ReportActions({
   profitAmount,
   chatterName = "Чатер",
   recruiterName,
-  ownerName
+  ownerName,
+  accountAccess,
+  screenshot
 }: ReportActionsProps) {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -135,6 +139,8 @@ export function ReportActions({
           chatterName={chatterName}
           recruiterName={recruiterName}
           ownerName={ownerName}
+          accountAccess={accountAccess}
+          screenshot={screenshot}
           onClose={handleApproveSuccess}
         />
       )}

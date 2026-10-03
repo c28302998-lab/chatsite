@@ -10,10 +10,12 @@ interface Props {
   chatterName: string;
   recruiterName?: string | null;
   ownerName?: string | null;
+  accountAccess?: string | null;
+  screenshot?: string | null;
   onClose: () => void;
 }
 
-export function ApproveReportModal({ reportId, profitAmount, chatterName, recruiterName, ownerName, onClose }: Props) {
+export function ApproveReportModal({ reportId, profitAmount, chatterName, recruiterName, ownerName, accountAccess, screenshot, onClose }: Props) {
   const [chatterAmount, setChatterAmount] = useState<number>(0);
   const [recruiterAmount, setRecruiterAmount] = useState<number>(0);
   const [ownerAmount, setOwnerAmount] = useState<number>(0);
@@ -50,6 +52,22 @@ export function ApproveReportModal({ reportId, profitAmount, chatterName, recrui
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {(accountAccess || screenshot) && (
+          <div className="px-6 pt-4 space-y-2">
+            {screenshot && (
+              <a href={screenshot} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline text-sm block">
+                Скриншот отчета
+              </a>
+            )}
+            {accountAccess && (
+              <div className="text-sm">
+                <span className="text-slate-400">Доступы:</span>{" "}
+                <span className="text-white bg-black/30 px-2 py-1 rounded select-all break-all">{accountAccess}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-1.5">

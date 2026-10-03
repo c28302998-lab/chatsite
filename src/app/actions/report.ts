@@ -50,12 +50,17 @@ export async function addReport(formData: FormData) {
       throw new Error("Сумма профита должна быть числом");
     }
 
+    const screenshot = formData.get("screenshot") as string | null;
+    const accountAccess = formData.get("accountAccess") as string | null;
+
     await prisma.report.create({
       data: {
         chatterId,
         shiftStart,
         shiftEnd,
         profitAmount,
+        screenshot: screenshot || undefined,
+        accountAccess: accountAccess || undefined,
       },
     });
 

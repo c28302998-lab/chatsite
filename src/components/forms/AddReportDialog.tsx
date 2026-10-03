@@ -70,6 +70,16 @@ export function AddReportDialog({ chatters }: { chatters: { id: string, name: st
             <Input id="profitAmount" name="profitAmount" type="number" step="0.01" min="0" required className="bg-zinc-900 border-zinc-800 focus:border-[#B9FF66]" />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="screenshot">Ссылка на скриншот (опционально)</Label>
+            <Input id="screenshot" name="screenshot" type="url" placeholder="https://..." className="bg-zinc-900 border-zinc-800 focus:border-[#B9FF66]" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="accountAccess">Доступы (Логин / Пароль) (опционально)</Label>
+            <Input id="accountAccess" name="accountAccess" type="text" placeholder="Укажите доступы, если нужно" className="bg-zinc-900 border-zinc-800 focus:border-[#B9FF66]" />
+          </div>
+
           {error && <div className="text-red-500 text-sm">{error}</div>}
           
           <div className="flex justify-end pt-2">

@@ -166,7 +166,7 @@ export default async function ReportsPage() {
                       </td>
                       <td className="px-6 py-4">
                         {report.accountAccess ? (
-                          <div className="text-xs bg-black/30 p-2 rounded max-w-[150px] truncate" title={report.accountAccess}>
+                          <div className="text-xs bg-black/30 p-2 rounded break-all whitespace-pre-wrap">
                             {report.accountAccess}
                           </div>
                         ) : (
@@ -199,6 +199,8 @@ export default async function ReportsPage() {
                       chatterName={report.chatter?.name || 'Без имени'}
                       recruiterName={report.chatter?.invitedBy?.name || ''}
                       ownerName={report.chatter?.band?.owner?.name || ''}
+                      accountAccess={report.accountAccess}
+                      screenshot={report.screenshot}
                     />
                   </td>
                 </tr>
