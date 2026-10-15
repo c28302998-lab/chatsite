@@ -35,9 +35,22 @@ export async function POST(req: Request) {
     };
 
     // Если есть реферальные параметры, привязываем
-    if (inviteBy && bandId) {
-      createData.bandId = bandId;
+    if (inviteBy) {
       createData.invitedById = inviteBy;
+    }
+
+    if (bandId) {
+      createData.bandId = bandId;
+    } else if (inviteBy) {
+      const inviter = await prisma.user.findUnique({
+        where: { id: inviteBy },
+        include: { ownedBand: true }
+      });
+      if (inviter?.ownedBand?.id) {
+        createData.bandId = inviter.ownedBand.id;
+      } else if (inviter?.bandId) {
+        createData.bandId = inviter.bandId;
+      }
     }
 
     const user = await prisma.user.create({

@@ -20,55 +20,75 @@ export default async function ReportsPage() {
     
     if (!currentUser) return null;
 
-    let bandId = null;
+    let bandId = currentUser?.ownedBand?.id || currentUser?.bandId || null;
     let isChatter = currentUser?.role === 'CHATTER';
-
-    if (currentUser?.role === 'PARTNER' && currentUser.ownedBand) {
-      bandId = currentUser.ownedBand.id;
-    } else if (currentUser?.role === 'WORKER') {
-      bandId = currentUser.bandId;
-    } else if (isChatter) {
-      bandId = currentUser.bandId;
-    }
 
     if (currentUser?.role === 'ADMIN') {
       reports = await prisma.report.findMany({
         include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
         orderBy: { createdAt: 'desc' }
       });
-    } else if (bandId) {
-      if (isChatter) {
-        // Chatters only see their own reports
-        reports = await prisma.report.findMany({
-          where: { chatterId: session.user.id },
-          include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
-          orderBy: { createdAt: 'desc' }
-        });
-      } else {
-        // Partners/Workers see all reports in their band
-        reports = await prisma.report.findMany({
-          where: { chatter: { bandId } },
-          include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
-          orderBy: { createdAt: 'desc' }
-        });
-      }
-    }
-
-    // Only fetch chatters for dropdown if user is a Chatter (to select themselves) or if we want to filter
-    if (currentUser?.role === 'ADMIN') {
       chatters = await prisma.user.findMany({
         where: { role: 'CHATTER' },
         select: { id: true, name: true }
       });
-    } else if (bandId) {
-      if (isChatter) {
-        chatters = [{ id: currentUser.id, name: currentUser.name }];
-      } else {
-        chatters = await prisma.user.findMany({
-          where: { bandId, role: 'CHATTER' },
-          select: { id: true, name: true }
-        });
-      }
+    } else if (isChatter) {
+      // Chatters only see their own reports
+      reports = await prisma.report.findMany({
+        where: { chatterId: session.user.id },
+        include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
+        orderBy: { createdAt: 'desc' }
+      });
+      chatters = [{ id: currentUser.id, name: currentUser.name }];
+    } else if (currentUser?.role === 'PARTNER' && currentUser.ownedBand) {
+      // Team Owner: sees all reports in their band or from invitees
+      const teamWorkers = await prisma.user.findMany({
+        where: {
+          OR: [
+            { id: currentUser.id },
+            { bandId: bandId },
+            { invitedById: currentUser.id }
+          ]
+        },
+        select: { id: true }
+      });
+      const teamUserIds = teamWorkers.map(u => u.id);
+
+      reports = await prisma.report.findMany({
+        where: {
+          chatter: {
+            OR: [
+              { bandId: bandId },
+              { invitedById: { in: teamUserIds } }
+            ]
+          }
+        },
+        include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      chatters = await prisma.user.findMany({
+        where: {
+          role: 'CHATTER',
+          OR: [
+            { bandId: bandId },
+            { invitedById: { in: teamUserIds } }
+          ]
+        },
+        select: { id: true, name: true }
+      });
+    } else {
+      // Sub-recruiter or Solo partner: sees reports of their own invited chatters
+      reports = await prisma.report.findMany({
+        where: { chatter: { invitedById: currentUser.id } },
+        include: { chatter: { include: { invitedBy: true, band: { include: { owner: true } } } } },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      chatters = await prisma.user.findMany({
+        where: { role: 'CHATTER', invitedById: currentUser.id },
+        select: { id: true, name: true }
+      });
     }
   }
 

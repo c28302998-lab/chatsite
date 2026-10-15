@@ -19,8 +19,6 @@ export default async function ChattersPage() {
       include: { ownedBand: true }
     });
 
-    let isOwner = false;
-
     if (currentUser?.role === 'ADMIN') {
       // Админ видит ВСЕХ чатеров
       chatters = await prisma.user.findMany({
@@ -28,41 +26,45 @@ export default async function ChattersPage() {
         include: { invitedBy: true },
         orderBy: { createdAt: 'desc' }
       });
+    } else if (currentUser?.role === 'PARTNER' && currentUser.ownedBand) {
+      // Владелец команды (администратор команды)
+      bandId = currentUser.ownedBand.id;
+      
+      const teamWorkers = await prisma.user.findMany({
+        where: {
+          OR: [
+            { id: currentUserId },
+            { bandId: bandId },
+            { invitedById: currentUserId }
+          ]
+        },
+        select: { id: true }
+      });
+      const teamUserIds = teamWorkers.map(u => u.id);
+
+      chatters = await prisma.user.findMany({
+        where: {
+          role: 'CHATTER',
+          OR: [
+            { bandId: bandId },
+            { invitedById: { in: teamUserIds } }
+          ]
+        },
+        include: { invitedBy: true },
+        orderBy: { createdAt: 'desc' }
+      });
     } else {
-      if (currentUser?.role === 'PARTNER' && currentUser.ownedBand) {
-        bandId = currentUser.ownedBand.id;
-        isOwner = true;
-      } else if (currentUser?.role === 'PARTNER' && currentUser.bandId) {
-        bandId = currentUser.bandId;
-        isOwner = false;
-      } else if (currentUser?.role === 'WORKER') {
-        bandId = currentUser.bandId;
-        isOwner = false;
-      }
+      // Саб-рекрутер ("просто админ") или Одиночный рекрутер
+      bandId = currentUser?.bandId || null;
 
-      if (bandId) {
-        const whereClause: any = {
-          bandId,
-          role: 'CHATTER'
-        };
-
-        if (!isOwner) {
-          whereClause.invitedById = currentUserId;
-        }
-
-        chatters = await prisma.user.findMany({
-          where: whereClause,
-          include: { invitedBy: true },
-          orderBy: { createdAt: 'desc' }
-        });
-      } else {
-        // Одиночки видят только своих приглашенных чатеров
-        chatters = await prisma.user.findMany({
-          where: { invitedById: currentUserId, role: 'CHATTER' },
-          include: { invitedBy: true },
-          orderBy: { createdAt: 'desc' }
-        });
-      }
+      chatters = await prisma.user.findMany({
+        where: {
+          role: 'CHATTER',
+          invitedById: currentUserId
+        },
+        include: { invitedBy: true },
+        orderBy: { createdAt: 'desc' }
+      });
     }
   }
 

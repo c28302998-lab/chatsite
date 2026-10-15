@@ -17,19 +17,33 @@ async function approveBandRequest(formData: FormData) {
   if (!request) return;
 
   // Create band and update request
-  await prisma.$transaction([
-    prisma.band.create({
-      data: {
-        name: request.bandName,
-        ownerId: request.userId,
-      }
-    }),
-    prisma.bandRequest.update({
-      where: { id },
-      data: { status: "APPROVED" }
-    })
-  ]);
+  const band = await prisma.band.create({
+    data: {
+      name: request.bandName,
+      ownerId: request.userId,
+    }
+  });
+
+  await prisma.bandRequest.update({
+    where: { id },
+    data: { status: "APPROVED" }
+  });
+
+  // Attach owner and their invitees to the new band
+  await prisma.user.update({
+    where: { id: request.userId },
+    data: { bandId: band.id }
+  });
+
+  await prisma.user.updateMany({
+    where: { invitedById: request.userId },
+    data: { bandId: band.id }
+  });
+
   revalidatePath("/admin/bands");
+  revalidatePath("/chatters");
+  revalidatePath("/workers");
+  revalidatePath("/reports");
 }
 
 async function rejectBandRequest(formData: FormData) {

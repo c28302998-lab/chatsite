@@ -85,7 +85,14 @@ export async function acceptApplication(id: string) {
     if (!application) throw new Error("Заявка не найдена");
     if (application.userId) throw new Error("Чатер уже создан");
 
-    const bandId = application.recruiter.ownedBand?.id || application.recruiter.bandId || null;
+    let bandId = application.recruiter.ownedBand?.id || application.recruiter.bandId || null;
+    if (!bandId && application.recruiter.invitedById) {
+      const inviter = await prisma.user.findUnique({
+        where: { id: application.recruiter.invitedById },
+        include: { ownedBand: true }
+      });
+      bandId = inviter?.ownedBand?.id || inviter?.bandId || null;
+    }
 
     // Generate credentials
     const cleanPhone = application.phone?.replace(/[^0-9]/g, "") || "";
@@ -119,6 +126,11 @@ export async function acceptApplication(id: string) {
     });
 
     revalidatePath("/applications");
+    revalidatePath("/chatters");
+    revalidatePath("/admin/bands");
+    revalidatePath("/workers");
+    revalidatePath("/reports");
+    revalidatePath("/admin/users");
     return { success: true, email: generatedEmail, password: generatedPassword };
   } catch (error: any) {
     return { success: false, error: error.message };
